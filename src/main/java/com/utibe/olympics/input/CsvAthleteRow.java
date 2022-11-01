@@ -186,4 +186,18 @@ public class CsvAthleteRow {
                 ", medal='" + medal + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object object ){
+        if (object == null) {
+            return false;
+        }
+        if (object.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final CsvAthleteRow objectCsvAthleteRow = (CsvAthleteRow) object;
+
+        return this.getId() == objectCsvAthleteRow.getId();
+    }
 }
