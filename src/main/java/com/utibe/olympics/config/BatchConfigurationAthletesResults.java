@@ -1,14 +1,10 @@
 package com.utibe.olympics.config;
 
-import javax.sql.DataSource;
-
 import com.utibe.olympics.input.CsvAthleteRow;
-import com.utibe.olympics.output.tables.athletenames.AthleteNames;
-import com.utibe.olympics.processor.AthletesNamesFilterProcessor;
-import com.utibe.olympics.processor.AthletesnamesProcessor;
-import com.utibe.olympics.processor.AthletesNamesJobCompletionNotificationListener;
-
-
+import com.utibe.olympics.output.tables.athletesresults.AthletesResults;
+import com.utibe.olympics.output.tables.athletesresults.AthletesResultsFilterProcessor;
+import com.utibe.olympics.output.tables.athletesresults.AthletesResultsJobCompletionNotificationListener;
+import com.utibe.olympics.output.tables.athletesresults.AthletesResultsProcessor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -29,57 +25,49 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
+public class BatchConfigurationAthletesResults {
 
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
 
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
-    // end::setup[]
-
-    // tag::readerwriterprocessor[]
-
-    //String id, String name, String sex, String age, String height, String weight,
-    //                         String team, String noc, String games, String year, String season, String city,
-    //                         String sport, String event, String medal
 
     @Bean
     @ConditionalOnProperty(
-            value="utibe.table.athletes.load",
-            havingValue = "true",
-            matchIfMissing = false
+            value="utibe.table.athletesresults.load",
+            havingValue = "true"
     )
-    public Job importAthleteJob(AthletesNamesJobCompletionNotificationListener listener, Step step1) {
-        return jobBuilderFactory.get("importUserJob")
+    public Job importAthletesResultsJobAthletesResults(AthletesResultsJobCompletionNotificationListener listener,
+                                                     Step step1AthletesResults) {
+        return jobBuilderFactory.get("importAthletesResults")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(step1)
+                .flow(step1AthletesResults)
                 .end()
                 .build();
     }
 
     @Bean
-    public Step step1(JdbcBatchItemWriter<AthleteNames> writer) {
-        return stepBuilderFactory.get("step1")
-                .<CsvAthleteRow, AthleteNames> chunk(3)
-                .reader(reader())
-                .processor(compositeItemProcessor())
-                //.processor(filterProcessor())
-                //.processor(processor())
-                .writer(writer)
+    public Step step1AthletesResults(JdbcBatchItemWriter<AthletesResults> writerAthletesResults) {
+        return stepBuilderFactory.get("step1AthletesResults")
+                .<CsvAthleteRow, AthletesResults> chunk(3)
+                .reader(readerAthletesResults())
+                .processor(compositeItemProcessorAthletesResults())
+                .writer(writerAthletesResults)
                 .build();
     }
 
     @Bean
-    public FlatFileItemReader<CsvAthleteRow> reader() {
+    public FlatFileItemReader<CsvAthleteRow> readerAthletesResults() {
         return new FlatFileItemReaderBuilder<CsvAthleteRow>()
-                .name("personItemReader")
-                .resource(new ClassPathResource("test.csv"))
+                .name("AthletesResultsReader")
+                .resource(new ClassPathResource("OLYMPICS_athlete_events.csv"))
                 .delimited()
                 .names("id", "name", "sex", "age", "height", "weight", "team", "noc", "games",
                         "year", "season", "city", "sport", "event", "medal")
@@ -90,36 +78,30 @@ public class BatchConfiguration {
                 .build();
     }
     @Bean
-    public ItemProcessor<CsvAthleteRow, AthleteNames> compositeItemProcessor() {
-        CompositeItemProcessor<CsvAthleteRow, AthleteNames> compositeItemProcessor = new CompositeItemProcessor<>();
-        compositeItemProcessor.setDelegates(Arrays.asList(filterProcessor(), processor()));
+    public ItemProcessor<CsvAthleteRow, AthletesResults> compositeItemProcessorAthletesResults() {
+        CompositeItemProcessor<CsvAthleteRow, AthletesResults> compositeItemProcessor = new CompositeItemProcessor<>();
+        compositeItemProcessor.setDelegates(Arrays.asList(filterProcessorAthletesResults(), processorAthletesResults()));
         return compositeItemProcessor;
     }
 
-
     @Bean
-    public AthletesnamesProcessor processor() {
-        return new AthletesnamesProcessor();
+    public AthletesResultsProcessor processorAthletesResults() {
+        return new AthletesResultsProcessor();
     }
 
     @Bean
-    public AthletesNamesFilterProcessor filterProcessor() {
-        return new AthletesNamesFilterProcessor();
+    public AthletesResultsFilterProcessor filterProcessorAthletesResults() {
+        return new AthletesResultsFilterProcessor();
     }
 
     @Bean
-    public JdbcBatchItemWriter<AthleteNames> writer(DataSource dataSource) {
-        return new JdbcBatchItemWriterBuilder<AthleteNames>()
+    public JdbcBatchItemWriter<AthletesResults> writerAthletesResults(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder<AthletesResults>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO athletesnames (id, name) VALUES (:id, :name)")
-                //.sql("select id, name from athletesnames ")
+                .sql("INSERT INTO athletesresults (id, noc, games, event, medal, sex, age, height, weight) " +
+                        "VALUES (:id, :noc, :games, :event, :medal, :sex, :age, :height, :weight)")
                 .dataSource(dataSource)
                 .build();
     }
-    // end::readerwriterprocessor[]
 
-    // tag::jobstep[]
-
-
-    // end::jobstep[]
 }
