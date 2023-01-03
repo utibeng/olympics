@@ -98,7 +98,7 @@ public class BatchConfigurationHosts {
     public JdbcBatchItemWriter<Hosts> writerHosts(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Hosts>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO hosts (games, year, season, city ) " +
+                .sql("INSERT INTO olympics_hosts (games, year, season, city ) " +
                         "VALUES (:games, :year, :season, :city)")
                 .dataSource(dataSource)
                 .build();

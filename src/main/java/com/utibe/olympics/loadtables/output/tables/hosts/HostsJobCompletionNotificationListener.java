@@ -27,7 +27,7 @@ public class HostsJobCompletionNotificationListener extends JobExecutionListener
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("!!! Hosts JOB FINISHED! Time to verify the results");
 
-            jdbcTemplate.query("SELECT games, year, season, city FROM hosts",
+            jdbcTemplate.query("SELECT games, year, season, city FROM olympics_hosts",
                     (rs, row) -> new Hosts(
                             rs.getString(1),
                             rs.getString(2),

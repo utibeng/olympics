@@ -40,13 +40,6 @@ public class BatchConfiguration {
 
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
-    // end::setup[]
-
-    // tag::readerwriterprocessor[]
-
-    //String id, String name, String sex, String age, String height, String weight,
-    //                         String team, String noc, String games, String year, String season, String city,
-    //                         String sport, String event, String medal
 
     @Bean
     @ConditionalOnProperty(

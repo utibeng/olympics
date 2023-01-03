@@ -12,7 +12,7 @@ public class AthleteNames {
     public AthleteNames(int ID, String name) {
         this.id= ID;
         this.name = name;
-        System.out.println("ID = " + this.id + " Name = " + this.getName());
+        //System.out.println("ID = " + this.id + " Name = " + this.getName());
     }
 
     /*public long recordCount(Supplier<Stream<CSVRecord>> csvRecordsSupplier){

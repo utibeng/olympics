@@ -27,7 +27,7 @@ public class AthletesResultsJobCompletionNotificationListener extends JobExecuti
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("!!! Hosts JOB FINISHED! Time to verify the results");
 
-            jdbcTemplate.query("SELECT id, noc, games, event, medal, sex, age, height, weight FROM athletesresults",
+            jdbcTemplate.query("SELECT id, noc, games, event, medal, sex, age, height, weight FROM olympics_athletesresults",
                     (rs, row) -> new AthletesResults(
                             rs.getInt(1),
                             rs.getString(2),

@@ -23,7 +23,7 @@ public class HostsFilterProcessor implements ItemProcessor<CsvAthleteRow, CsvAth
         String hostsKey = csvAthleteRow.getGames();
 
         if(processedHosts.contains(hostsKey) ){
-            logger.info("trapped duplicate for hostsKey {}", hostsKey);
+            //logger.info("trapped duplicate for hostsKey {}", hostsKey);
             return null;
         }
         processedHosts.add(hostsKey);
